@@ -1,5 +1,7 @@
 package com.example.tp_1_kotlin.ui.theme.login
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.runtime.Composable
 
@@ -9,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -16,7 +19,9 @@ import androidx.navigation.NavController
 
 @Composable
 fun LoginScreen(navController: NavController) {
-    var username by remember { mutableStateOf("") }
+    val context = LocalContext.current
+
+    var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
 
@@ -41,9 +46,9 @@ fun LoginScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
 
             TextField(
-                value = username,
-                onValueChange = { username = it },
-                label = { Text("Usuario") }
+                value = email,
+                onValueChange = { email = it },
+                label = { Text("Email") }
             )
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -59,8 +64,9 @@ fun LoginScreen(navController: NavController) {
 
             Button(
                 onClick = {
-                    if (username == "Juan Torres" && password == "1234utn") {
-                        navController.navigate("welcome/$username")
+                    if (validateUserCredentials(context, email, password)) {
+                        Toast.makeText(context, "Inicio de sesión exitoso", Toast.LENGTH_LONG).show()
+                        navController.navigate("welcome/$email")
                     } else {
                         errorMessage = "Usuario o contraseña incorrectos"
                     }
@@ -77,4 +83,13 @@ fun LoginScreen(navController: NavController) {
             }
         }
     }
+}
+
+// Función para validar credenciales en SharedPreferences
+fun validateUserCredentials(context: Context, email: String, password: String): Boolean {
+    val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+    val storedEmail = sharedPreferences.getString("email", null)
+    val storedPassword = sharedPreferences.getString("password", null)
+
+    return email == storedEmail && password == storedPassword
 }
