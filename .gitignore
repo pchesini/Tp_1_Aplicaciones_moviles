@@ -1,0 +1,20 @@
+# Archivos de Android Studio
+*.iml
+.idea/
+*.hprof
+
+# Archivos de compilación
+/build/
+.gradle/
+.externalNativeBuild/
+.cxx/
+
+# Archivos de configuración local
+local.properties
+/local.properties
+
+# Archivos de macOS
+.DS_Store
+
+# Cachés y configuraciones innecesarias
+/captures/
