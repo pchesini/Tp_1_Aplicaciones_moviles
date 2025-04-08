@@ -15,7 +15,7 @@ fun NavGraph(navController: NavHostController) {
         composable("register") { RegisterScreen(navController) }
         composable("welcome/{username}") { backStackEntry ->
             val username = backStackEntry.arguments?.getString("username") ?: "Usuario"
-            WelcomeScreen(username)
+            WelcomeScreen(username, navController)
         }
     }
 }

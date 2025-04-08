@@ -2,18 +2,18 @@ package com.example.tp_1_kotlin.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
+// LIGHT
+val PrimaryLight = Color(0xFF8B6D5C)
+val OnPrimaryLight = Color(0xFFFDF6EC)
+val BackgroundLight = Color(0xFFFDF6EC)
+val SurfaceLight = Color(0xFFEEDDC1)
+val OnSurfaceLight = Color(0xFF6F5647)
+val ErrorLight = Color(0xFFD9534F)
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
-
-val Purple40 = Color(0xFF6200EE) // Color principal de la app
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
-
-val BackgroundLight = Color(0xFFF5F5F5) // Color de fondo en modo claro
-val BackgroundDark = Color(0xFF121212) // Color de fondo en modo oscuro
-val TextLight = Color(0xFF212121) // Color del texto en modo claro
-val TextDark = Color(0xFFFFFFFF) // Color del texto en modo oscuro
-
-
+// DARK
+val PrimaryDark = Color(0xFFD2B48C)
+val OnPrimaryDark = Color(0xFF2C1B10)
+val BackgroundDark = Color(0xFF2C1B10)
+val SurfaceDark = Color(0xFF3E2E21)
+val OnSurfaceDark = Color(0xFFEADAC8)
+val ErrorDark = Color(0xFFF28B82)
