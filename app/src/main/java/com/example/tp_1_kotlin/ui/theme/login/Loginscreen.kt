@@ -27,6 +27,15 @@ fun LoginScreen(navController: NavController) {
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
 
+    fun loginUser() {
+        if (validateUserCredentials(context, name, password)) {
+            Toast.makeText(context, "Inicio de sesión exitoso", Toast.LENGTH_LONG).show()
+            navController.navigate("welcome/$name")
+        } else {
+            errorMessage = "Usuario o contraseña incorrectos"
+        }
+    }
+
     Box(
         contentAlignment = Alignment.Center
     ) {
@@ -54,7 +63,14 @@ fun LoginScreen(navController: NavController) {
             TextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = name,
-                onValueChange = { name = it },
+                onValueChange = {
+                    if (it.contains("\n")) {
+                        name = it.replace("\n", "")
+                        loginUser()
+                    } else {
+                        name = it
+                    }
+                },
                 label = { Text("Nombre") },
                 maxLines = 1
             )
@@ -63,7 +79,14 @@ fun LoginScreen(navController: NavController) {
             TextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = password,
-                onValueChange = { password = it },
+                onValueChange = {
+                    if (it.contains("\n")) {
+                        password = it.replace("\n", "")
+                        loginUser()
+                    } else {
+                        password = it
+                    }
+                },
                 label = { Text("Contraseña") },
                 visualTransformation = PasswordVisualTransformation(),
                 maxLines = 1
@@ -73,14 +96,7 @@ fun LoginScreen(navController: NavController) {
             Text(text = errorMessage, color = MaterialTheme.colorScheme.error)
 
             Button(
-                onClick = {
-                    if (validateUserCredentials(context, name, password)) {
-                        Toast.makeText(context, "Inicio de sesión exitoso", Toast.LENGTH_LONG).show()
-                        navController.navigate("welcome/$name")
-                    } else {
-                        errorMessage = "Usuario o contraseña incorrectos"
-                    }
-                },
+                onClick = { loginUser() },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Ingresar")

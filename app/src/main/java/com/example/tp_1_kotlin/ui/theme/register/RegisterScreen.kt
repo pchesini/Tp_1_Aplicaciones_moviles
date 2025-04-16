@@ -16,6 +16,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(navController: NavController) {
@@ -27,9 +28,25 @@ fun RegisterScreen(navController: NavController) {
     var confirmPassword by remember { mutableStateOf("") }
 
     var nameError by remember { mutableStateOf(false) }
-    var emailError by remember { mutableStateOf(false) }
+    var emailError1 by remember { mutableStateOf(false) }
+    var emailError2 by remember { mutableStateOf(false) }
     var passwordError by remember { mutableStateOf(false) }
     var confirmPasswordError by remember { mutableStateOf(false) }
+
+    fun validateFields():Boolean{
+        nameError = name.isBlank()
+        emailError1 = email.isBlank()
+        emailError2 = !email.matches(Regex("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+\$"))
+        passwordError = password.length < 6
+        confirmPasswordError = password != confirmPassword
+        return !nameError && !emailError1 && !emailError2 && !passwordError && !confirmPasswordError
+    }
+
+    fun succesfulRegister(){
+        saveUserCredentials(context, name, email, password)
+        Toast.makeText(context, "Registro exitoso", Toast.LENGTH_LONG).show()
+        navController.navigate("login")
+    }
 
     Scaffold(
         modifier = Modifier
@@ -56,7 +73,16 @@ fun RegisterScreen(navController: NavController) {
 
             OutlinedTextField(
                 value = name,
-                onValueChange = { name = it },
+                onValueChange = {
+                    if (it.contains("\n")) {
+                        name = it.replace("\n", "")
+                        if(validateFields()){
+                            succesfulRegister()
+                        }
+                    } else {
+                        name = it
+                    }
+                },
                 label = { Text("Nombre") },
                 modifier = Modifier.fillMaxWidth(),
                 isError = nameError,
@@ -74,16 +100,32 @@ fun RegisterScreen(navController: NavController) {
 
             OutlinedTextField(
                 value = email,
-                onValueChange = { email = it },
+                onValueChange = {
+                    if (it.contains("\n")) {
+                        email = it.replace("\n", "")
+                        if(validateFields()){
+                            succesfulRegister()
+                        }
+                    } else {
+                        email = it
+                    }
+                },
                 label = { Text("Email") },
                 modifier = Modifier.fillMaxWidth(),
-                isError = emailError,
+                isError = emailError1 || emailError2,
                 maxLines = 1
             )
 
-            if (emailError) {
+            if (emailError1) {
                 Text(
                     "El email no puede estar vacío",
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+
+            if (emailError2 && !emailError1) {
+                Text(
+                    "El email debe tener el formato: usuario@ejemplo.com",
                     color = MaterialTheme.colorScheme.error
                 )
             }
@@ -92,7 +134,16 @@ fun RegisterScreen(navController: NavController) {
 
             OutlinedTextField(
                 value = password,
-                onValueChange = { password = it },
+                onValueChange = {
+                    if (it.contains("\n")) {
+                        password = it.replace("\n", "")
+                        if(validateFields()){
+                            succesfulRegister()
+                        }
+                    } else {
+                        password = it
+                    }
+                },
                 label = { Text("Contraseña") },
                 modifier = Modifier.fillMaxWidth(),
                 visualTransformation = PasswordVisualTransformation(),
@@ -111,7 +162,16 @@ fun RegisterScreen(navController: NavController) {
 
             OutlinedTextField(
                 value = confirmPassword,
-                onValueChange = { confirmPassword = it },
+                onValueChange = {
+                    if (it.contains("\n")) {
+                        confirmPassword = it.replace("\n", "")
+                        if(validateFields()){
+                            succesfulRegister()
+                        }
+                    } else {
+                        confirmPassword = it
+                    }
+                },
                 label = { Text("Repetir Contraseña") },
                 modifier = Modifier.fillMaxWidth(),
                 visualTransformation = PasswordVisualTransformation(),
@@ -130,15 +190,8 @@ fun RegisterScreen(navController: NavController) {
 
             Button(
                 onClick = {
-                    nameError = name.isBlank()
-                    emailError = email.isBlank()
-                    passwordError = password.length < 6
-                    confirmPasswordError = password != confirmPassword
-
-                    if (!nameError && !emailError && !passwordError && !confirmPasswordError) {
-                        saveUserCredentials(context, name, email, password)
-                        Toast.makeText(context, "Registro exitoso", Toast.LENGTH_LONG).show()
-                        navController.navigate("login")
+                    if (validateFields()) {
+                        succesfulRegister()
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -158,3 +211,4 @@ fun saveUserCredentials(context: Context,name: String, email: String, password: 
         apply()
     }
 }
+
