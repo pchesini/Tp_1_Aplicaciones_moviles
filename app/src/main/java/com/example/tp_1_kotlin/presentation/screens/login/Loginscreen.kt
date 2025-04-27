@@ -1,38 +1,40 @@
-package com.example.tp_1_kotlin.ui.theme.login
+package com.example.tp_1_kotlin.presentation.screens.login
 
-import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.tp_1_kotlin.R
+import com.example.tp_1_kotlin.presentation.navigation.Home
+import com.example.tp_1_kotlin.presentation.navigation.Register
 
 @Composable
-fun LoginScreen(navController: NavController) {
+fun LoginScreen(navController: NavController, viewModel: LoginViewModel) {
     val context = LocalContext.current
-
-    var name by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var errorMessage by remember { mutableStateOf("") }
+    val name = viewModel.state.name
+    val password = viewModel.state.password
+    val errorMessage = viewModel.state.errorMessage
 
     fun loginUser() {
-        if (validateUserCredentials(context, name, password)) {
+        if (viewModel.validateUserCredentials(name, password)) {
             Toast.makeText(context, "Inicio de sesión exitoso", Toast.LENGTH_LONG).show()
-            navController.navigate("welcome/$name")
+            navController.navigate(Home(username = name))
         } else {
-            errorMessage = "Usuario o contraseña incorrectos"
+            viewModel.onErrorMessageChange("Usuario o contraseña incorrectos")
         }
     }
 
@@ -63,33 +65,35 @@ fun LoginScreen(navController: NavController) {
             TextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = name,
-                onValueChange = {
-                    if (it.contains("\n")) {
-                        name = it.replace("\n", "")
+                onValueChange = { viewModel.onNameChange(it) },
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
                         loginUser()
-                    } else {
-                        name = it
                     }
-                },
+                ),
                 label = { Text("Nombre") },
-                maxLines = 1
+                singleLine = true
             )
             Spacer(modifier = Modifier.height(8.dp))
 
             TextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = password,
-                onValueChange = {
-                    if (it.contains("\n")) {
-                        password = it.replace("\n", "")
+                onValueChange = { viewModel.onPasswordChange(it) },
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
                         loginUser()
-                    } else {
-                        password = it
                     }
-                },
+                ),
                 label = { Text("Contraseña") },
                 visualTransformation = PasswordVisualTransformation(),
-                maxLines = 1
+                singleLine = true
             )
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -104,22 +108,9 @@ fun LoginScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            TextButton(onClick = { navController.navigate("register") }) {
+            TextButton(onClick = { navController.navigate(Register) }) {
                 Text("Registrarse", color = MaterialTheme.colorScheme.primary)
             }
         }
     }
-}
-
-// Función para validar credenciales en SharedPreferences y permitir "Juan Torres"
-fun validateUserCredentials(context: Context, name: String, password: String): Boolean {
-    if (name == "Juan Torres" && password == "1234utn") {
-        return true
-    }
-
-    val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
-    val storedName = sharedPreferences.getString("name", null)
-    val storedPassword = sharedPreferences.getString("password", null)
-
-    return name == storedName && password == storedPassword
 }

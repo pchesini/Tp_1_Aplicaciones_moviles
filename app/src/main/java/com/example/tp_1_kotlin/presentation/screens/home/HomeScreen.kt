@@ -1,4 +1,4 @@
-package com.example.tp_1_kotlin.ui.theme.WelcomeScreen
+package com.example.tp_1_kotlin.presentation.screens.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -13,16 +13,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.tp_1_kotlin.R
+import com.example.tp_1_kotlin.presentation.navigation.Login
 
 @Composable
-fun WelcomeScreen(
+fun HomeScreen(
     username: String,
-    navController: NavController
+    navController: NavController,
+    viewModel: HomeViewModel
 ) {
-    var selectedPlatform by remember { mutableStateOf("Android") }
-    var preferences by remember { mutableStateOf(setOf<String>()) }
-    var otherPreference by remember { mutableStateOf("") }
-    var showTextField by remember { mutableStateOf(false) }
+    val selectedPlatform = viewModel.state.selectedPlatform
+    val preferences = viewModel.state.preferences
+    val otherPreference = viewModel.state.otherPreference
+    val showTextField = viewModel.state.showTextField
+    val options = listOf("Programación", "Redes", "Seguridad", "Hardware", "Otra")
+    val logoRes = if (selectedPlatform == "Android") R.drawable.android_logo else R.drawable.ios_logo
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -69,7 +73,7 @@ fun WelcomeScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         RadioButton(
                             selected = selectedPlatform == "Android",
-                            onClick = { selectedPlatform = "Android" }
+                            onClick = { viewModel.onSelectedPlatformChange("Android") }
                         )
                         Text("Android", color = MaterialTheme.colorScheme.onSurface)
 
@@ -77,14 +81,13 @@ fun WelcomeScreen(
 
                         RadioButton(
                             selected = selectedPlatform == "iOS",
-                            onClick = { selectedPlatform = "iOS" }
+                            onClick = { viewModel.onSelectedPlatformChange("iOS") }
                         )
                         Text("iOS", color = MaterialTheme.colorScheme.onSurface)
                     }
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    val logoRes = if (selectedPlatform == "Android") R.drawable.android_logo else R.drawable.ios_logo
                     Image(
                         painter = painterResource(id = logoRes),
                         contentDescription = "Logo",
@@ -101,16 +104,14 @@ fun WelcomeScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    val options = listOf("Programación", "Redes", "Seguridad", "Hardware", "Otra")
-
                     Column(modifier = Modifier.fillMaxWidth()) {
                         options.forEach { option ->
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Checkbox(
                                     checked = preferences.contains(option),
                                     onCheckedChange = { isChecked ->
-                                        preferences = if (isChecked) preferences + option else preferences - option
-                                        if (option == "Otra") showTextField = isChecked
+                                        viewModel.onPreferenceCheckChange(isChecked, option)
+                                        if (option == "Otra") viewModel.onShowTextFieldChange(isChecked)
                                     }
                                 )
                                 Text(option, color = MaterialTheme.colorScheme.onSurface)
@@ -122,7 +123,7 @@ fun WelcomeScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                         TextField(
                             value = otherPreference,
-                            onValueChange = { otherPreference = it },
+                            onValueChange = { viewModel.onOtherPreferenceChange(it) },
                             label = { Text("Ingrese su preferencia") },
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
@@ -141,8 +142,8 @@ fun WelcomeScreen(
 
                     Button(
                         onClick = {
-                            navController.navigate("login") {
-                                popUpTo("welcome") { inclusive = true }
+                            navController.navigate(Login) {
+                                popUpTo(Login) { inclusive = true }
                             }
                         },
                         colors = ButtonDefaults.buttonColors(

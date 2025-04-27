@@ -1,4 +1,4 @@
-package com.example.tp_1_kotlin.ui.theme
+package com.example.tp_1_kotlin.presentation.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
